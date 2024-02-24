@@ -1,0 +1,49 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100vh;
+}
+
+.rightLine{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: calc(200px * 16);
+    height: calc(100vh / 6);
+    animation: scrollRight 100s linear infinite;
+}
+
+.leftLine{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: calc(200px * 16);
+    height: calc(100vh / 6);
+    animation: scrollLeft 100s linear infinite;
+}
+
+.image {
+    object-fit: cover;
+    width: 200px;
+    height: calc(100vh / 6);
+}
+
+
+@keyframes scrollRight {
+    from {
+        transform: translateX(-50%);
+    }
+    to {
+        transform: translateX(0%);
+    }
+}
+
+@keyframes scrollLeft {
+    from {
+        transform: translateX(0%);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
