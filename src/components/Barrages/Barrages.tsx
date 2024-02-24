@@ -69,7 +69,7 @@ function Barrage({ text, user }: {
                 setLine(Math.floor(Math.random() * BarrageLineCount));
             }}
         >
-            <img className={styles.avatar} width={50} height={50} src={avatar} alt="avatar" />
+            <Image className={styles.avatar} width={50} height={50} src={avatar} alt="avatar" />
             <span style={{
                 fontSize: '20px',
                 fontWeight: 'bold',
