@@ -5,7 +5,8 @@ import styles from './Barrages.module.css';
 import Image from 'next/image';
 import { ossURL, serverHost } from '@/config';
 
-const StaticBarrageData = [{
+/*
+ * {
     id: 1,
     text: '高考加油！！',
     user: 'Marry'
@@ -25,7 +26,14 @@ const StaticBarrageData = [{
     id: 5,
     text: '不负韶华！！',
     user: '马嘉祺'
-}]
+}
+ */
+
+const StaticBarrageData:{
+    id:number,
+    user:string,
+    text:string
+}[] = []
 
 /*
     弹幕从右往左滚动，滚动出界后随机出现在某一行
@@ -115,7 +123,6 @@ function Barrages() {
         fetch(serverHost+'/danmu', { method: 'GET' })
             .then(response => response.json())
             .then(response => {
-                console.log('刷新danmu')
                 setBarrages([...StaticBarrageData, ...response.data.map((item: any) => {
                     return {
                         id: item.id,

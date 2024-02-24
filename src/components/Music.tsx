@@ -1,42 +1,42 @@
 'use client';
 
 import { ossURL } from '@/config';
-import React, { useEffect, useState } from 'react'
+import React, { use, useCallback, useEffect, useState } from 'react'
 import { useAudio } from 'react-use';
 
 function Music() {
-    const [isSetVolume, setIsSetVolume] = useState(false)
+
     const [audio, state, controls, ref] = useAudio({
-        src: ossURL + '/audio/妈妈是女儿-伴奏.mp3',
+        src: ossURL + '/audio/家书.mp3',
         autoPlay: true,
-        loop: true
     });
     const [audio1, state1, controls1, ref1] = useAudio({
-        src: ossURL +'/audio/家书.m4a',
-        autoPlay: true,
+        src: ossURL +'/audio/妈妈是女儿.mp3',
+        autoPlay: false,
         loop: true
     });
-    //bgm音量小一点
-    useEffect(() => {
-        if (ref.current && !isSetVolume) {
-            ref.current.volume = 0.7
-            setIsSetVolume(true)
-        }
-    }, [ref, isSetVolume])
 
-    //每隔5秒尝试播放
+    //每隔2秒尝试播放家书,家书放完后循环播放妈妈是女儿
     useEffect(() => {
         const interval = setInterval(() => {
-            
             if (state.paused) {
                 controls.play()
             }
-            if (state1.paused) {
-                controls1.play()
-            }
-        }, 5000)
+        }, 2000)
         return () => clearInterval(interval)
-    }, [state, controls, state1, controls1])
+    }, [state, controls])
+
+
+    //家书(6分15秒)放完后播放妈妈是女儿
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if(ref1.current){
+                ref1.current.play()
+            }
+        }, 375000)
+        return () => clearTimeout(timer)
+    }, [ref1])
+    
     return (
         <div>
             {audio}

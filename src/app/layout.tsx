@@ -3,8 +3,8 @@ import "./globals.css";
 
 
 export const metadata: Metadata = {
-  title: "2024回忆墙",
-  description: "十一中2024级照片墙",
+  title: "重庆十一中高2024届成人礼表白墙",
+  description: "重庆十一中高2024届成人礼表白墙",
 };
 
 export default function RootLayout({
