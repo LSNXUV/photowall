@@ -7,7 +7,7 @@ import { useAudio } from 'react-use';
 function Music() {
     const [isSetVolume, setIsSetVolume] = useState(false)
     const [audio, state, controls, ref] = useAudio({
-        src: ossURL + '/audio/妈妈是女儿.mp3',
+        src: ossURL + '/audio/妈妈是女儿-伴奏.mp3',
         autoPlay: true,
         loop: true
     });
