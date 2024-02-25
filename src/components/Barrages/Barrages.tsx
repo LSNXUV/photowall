@@ -32,7 +32,8 @@ import { ossURL, serverHost } from '@/config';
 const StaticBarrageData:{
     id:number,
     user:string,
-    text:string
+    text:string,
+    isNew:boolean
 }[] = []
 
 /*
@@ -41,20 +42,45 @@ const StaticBarrageData:{
 const BarrageLineCount = 7;  //行数
 const BarrageMargin = 30;  //行间距
 
-const showTime = 20;  //弹幕平均显示时间,单位s
+const showTime = 30;  //弹幕平均显示时间,单位s
 const BarrageWidth = 250;  //弹幕宽度
-const maxBarrageWidth = 450;  //弹幕最大宽度
+const maxBarrageWidth = 650;  //弹幕最大宽度
 
 const getInterval = 5; //弹幕刷新间隔,单位s 
 
-function Barrage({ text, user }: {
+/**
+ * 如果超过16个字符，截取前16个字符，后面加上省略号
+ */
+const getSliceText = (text:string) => {
+    return text.length > 65 ? text.slice(0,65) + '...' : text
+}
+
+const getSliceUser = (user:string) => {
+    return user.length > 3 ? user.slice(0,3) : user
+}
+
+function Barrage({ text, user,id, cycleTime,isNew }: {
+    cycleTime: number,
+    isNew: boolean,
+    id: number,
     text: string,
     user: string
 }) {
     const [line, setLine] = useState(Math.floor(Math.random() * BarrageLineCount));
-    const [delay, setDelay] = useState(Math.random() * 5);
+    const [delay, setDelay] = useState(isNew ? 0 : (id - 17));
     const [avatar, setAvatar] = useState(`${ossURL}/avatar/avatar/${Math.floor(1 + Math.random() * 10)}.png`)
-    const [moveTime, setMoveTime] = useState(showTime - 5 + Math.random() * 10);
+    const [moveTime, setMoveTime] = useState(showTime - 10 + Math.random() * 20);
+    const [startCycle, setStartCycle] = useState(false)
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setStartCycle(true)
+            setLine(Math.floor(Math.random() * BarrageLineCount));
+            setDelay(id - 17);
+        },cycleTime * 1000)
+        return () => {
+            clearTimeout(timer)
+        }
+    },[])
     return (
         <div style={{
             display: 'flex',
@@ -66,11 +92,11 @@ function Barrage({ text, user }: {
             height: `calc(100% / ${BarrageLineCount} - ${BarrageMargin}px)`,
             minHeight: '60px',
             top: `calc(${line} * (100% / ${BarrageLineCount}) + ${BarrageMargin / 2}px)`,
-            right: `-${maxBarrageWidth}px`,
+            right: `-${maxBarrageWidth+50}px`,
             minWidth: `${BarrageWidth}px`,
             maxWidth: `${maxBarrageWidth}px`,
             paddingRight: '10px',
-            animation: `barrageScroll linear ${moveTime}s infinite`,
+            animation: `barrageScroll linear ${moveTime}s ${startCycle ? 'infinite' : ''}`,
             animationDelay: `${delay}s`
         }}
             onAnimationIteration={() => {
@@ -82,10 +108,10 @@ function Barrage({ text, user }: {
                 fontSize: '20px',
                 fontWeight: 'bold',
                 whiteSpace: 'nowrap',
-            }} >{user}</span>：
+            }} >{getSliceUser(user)}</span>：
             <span style={{
                 fontSize: '20px',
-            }}>{text}</span>
+            }}>{getSliceText(text)}</span>
         </div>
     );
 }
@@ -94,7 +120,8 @@ function Barrages() {
     const [barrages, setBarrages] = useState<{
         id: number,
         user: string,
-        text: string
+        text: string,
+        isNew: boolean
     }[]>(StaticBarrageData)
     const [user, setUser] = useState('')
     const userRef = React.useRef<HTMLInputElement>(null)
@@ -127,7 +154,8 @@ function Barrages() {
                     return {
                         id: item.id,
                         user: item.user,
-                        text: item.content
+                        text: item.content,
+                        isNew: false
                     }
                 })])
             })
@@ -161,7 +189,8 @@ function Barrages() {
                 setBarrages([...barrages, {
                     id: response.data.id,
                     user,
-                    text
+                    text,
+                    isNew: true
                 }])
             })
             .catch(err => {
@@ -169,7 +198,8 @@ function Barrages() {
                 setBarrages([...barrages, {
                     id: barrages.length + Math.floor(1000*Math.random()),
                     user,
-                    text
+                    text,
+                    isNew: true
                 }])
             });
         setText('')
@@ -185,18 +215,23 @@ function Barrages() {
             <div className={styles.container}>
                 {barrages.map((barrage, index) => {
                     return (
-                        <Barrage key={index} text={barrage.text} user={barrage.user} />
+                        <Barrage key={index} id={barrage.id} 
+                            text={barrage.text} 
+                            user={barrage.user} 
+                            cycleTime={barrages.length + barrage.id + 19}
+                            isNew={barrage.isNew}
+                        />
                     );
                 })}
             </div>
 
             {/* 添加弹幕 */}
             <div className={styles.addContainer}>
-                <input ref={userRef} placeholder='请输入用户名' type="text" value={user} onChange={(e) => setUser(e.target.value)}
-                    className={styles.userInput}
+                <input ref={userRef} placeholder='用户名' type="text" value={user} onChange={(e) => setUser(e.target.value)}
+                    className={styles.userInput} maxLength={4}
                 />
-                <input ref={textRef} placeholder='请输入内容' type="text" value={text} onChange={(e) => setText(e.target.value)}
-                    className={styles.textInput}
+                <input ref={textRef} placeholder='请输入内容,限30' type="text" value={text} onChange={(e) => setText(e.target.value)}
+                    className={styles.textInput} maxLength={30}
                 />
                 <button onClick={addBarrage} className={styles.sendBtn}
                 >发送弹幕</button>

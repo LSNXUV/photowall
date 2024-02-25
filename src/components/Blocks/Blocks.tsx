@@ -31,8 +31,11 @@ function Line({line,direction = 'right'}:{
           width: '200px',
           height: `${imageHeight}px`,
         }}>
-          <img src={`${ossURL}/images/images/${photo}.jpg`} width={'100%'} height={'auto'} style={{
+          <img src={`${ossURL}/images/images/${photo}.jpg`} style={{
+            width: '100%',
+            height: '100%',
             objectFit: 'cover',
+            objectPosition: 'center',
           }}
           alt="photo" />
         </div>
